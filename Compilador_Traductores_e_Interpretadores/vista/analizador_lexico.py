@@ -10,37 +10,44 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_home(object):
+class Ui_analizador_lexico(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(600, 600)
         MainWindow.setStyleSheet("background-color: rgb(85, 255, 255);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        
-        # Crear un layout vertical para centrar la interfaz
+
+        # Centrar la ventana
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        size = MainWindow.geometry()
+        MainWindow.move((screen.width() - size.width()) // 2, (screen.height() - size.height()) // 2)
+
+        # Layout principal
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        
-        # Agregar un espaciador para centrar el contenido
+
+        # Espaciador superior
         self.verticalSpacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(self.verticalSpacer)
 
+        # Título
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setStyleSheet("font: 18pt \"MS Shell Dlg 2\";")
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
 
+        # Layout horizontal para código y resultados
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        
+
         # GroupBox para el código
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.groupBox.setObjectName("groupBox")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.groupBox)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        
+
         # Editor de código
         self.codeEditor = QtWidgets.QPlainTextEdit(self.groupBox)
         font = QtGui.QFont()
@@ -50,38 +57,36 @@ class Ui_home(object):
         self.codeEditor.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.codeEditor.setObjectName("codeEditor")
         self.verticalLayout_2.addWidget(self.codeEditor)
-        
+
         # GroupBox para los resultados
         self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox_2.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.groupBox_2.setObjectName("groupBox_2")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_2)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        
-        # Visualizador de resultados
-        self.resultsViewer = QtWidgets.QPlainTextEdit(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(10)
-        self.resultsViewer.setFont(font)
-        self.resultsViewer.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.resultsViewer.setReadOnly(True)
-        self.resultsViewer.setObjectName("resultsViewer")
-        self.verticalLayout_3.addWidget(self.resultsViewer)
-        
+
+        # Tabla para resultados
+        self.resultsTable = QtWidgets.QTableWidget(self.groupBox_2)
+        self.resultsTable.setColumnCount(3)
+        self.resultsTable.setHorizontalHeaderLabels(["Tipo de Token", "Valor", "Posición"])
+        self.resultsTable.horizontalHeader().setStretchLastSection(True)
+        self.resultsTable.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.verticalLayout_3.addWidget(self.resultsTable)
+
         # Añadir los groupboxes al layout horizontal
         self.horizontalLayout.addWidget(self.groupBox)
         self.horizontalLayout.addWidget(self.groupBox_2)
-        
+
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        # Espaciador para centrar el contenido hacia abajo
+        # Espaciador inferior
         self.verticalSpacer2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(self.verticalSpacer2)
-        
+
+        # Layout para los botones
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        
+
         # Botón Cargar Archivo
         self.loadButton = QtWidgets.QPushButton(self.centralwidget)
         self.loadButton.setMinimumSize(QtCore.QSize(0, 40))
@@ -91,7 +96,7 @@ class Ui_home(object):
                                       "border-radius: 4px;")
         self.loadButton.setObjectName("loadButton")
         self.horizontalLayout_2.addWidget(self.loadButton)
-        
+
         # Botón Analizar
         self.analyzeButton = QtWidgets.QPushButton(self.centralwidget)
         self.analyzeButton.setMinimumSize(QtCore.QSize(0, 40))
@@ -101,7 +106,7 @@ class Ui_home(object):
                                          "border-radius: 4px;")
         self.analyzeButton.setObjectName("analyzeButton")
         self.horizontalLayout_2.addWidget(self.analyzeButton)
-        
+
         # Botón Limpiar
         self.clearButton = QtWidgets.QPushButton(self.centralwidget)
         self.clearButton.setMinimumSize(QtCore.QSize(0, 40))
@@ -111,7 +116,7 @@ class Ui_home(object):
                                        "border-radius: 4px;")
         self.clearButton.setObjectName("clearButton")
         self.horizontalLayout_2.addWidget(self.clearButton)
-        
+
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -122,13 +127,13 @@ class Ui_home(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Conectamos el botón Limpiar con la función limpiar()
+        # Conectar botón Limpiar
         self.clearButton.clicked.connect(self.limpiar)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Analizador Léxico - Primera fase - de - compilador"))
-        self.label.setText(_translate("MainWindow", "Analizador Lexico, Elaborado por: Juan Ruiz, Eladio Tortolero y Yull Rodriguez"))
+        self.label.setText(_translate("MainWindow", "Analizador Léxico, Elaborado por: Juan Ruiz, Eladio Tortolero y Yull Rodriguez"))
         self.groupBox.setTitle(_translate("MainWindow", "Código Java:"))
         self.groupBox_2.setTitle(_translate("MainWindow", "Resultados del análisis:"))
         self.loadButton.setText(_translate("MainWindow", "Cargar Archivo"))
@@ -136,7 +141,15 @@ class Ui_home(object):
         self.clearButton.setText(_translate("MainWindow", "Limpiar"))
 
     def limpiar(self):
-        # Limpiar los campos de texto
+        # Limpiar el editor de código y la tabla de resultados
         self.codeEditor.clear()
-        self.resultsViewer.clear()
+        self.resultsTable.setRowCount(0)
+
+    def mostrar_resultados(self, tokens):
+        """ Llena la tabla con los resultados del análisis léxico """
+        self.resultsTable.setRowCount(len(tokens))
+        for row, (tipo, valor, posicion) in enumerate(tokens):
+            self.resultsTable.setItem(row, 0, QtWidgets.QTableWidgetItem(tipo))
+            self.resultsTable.setItem(row, 1, QtWidgets.QTableWidgetItem(valor))
+            self.resultsTable.setItem(row, 2, QtWidgets.QTableWidgetItem(str(posicion)))
 

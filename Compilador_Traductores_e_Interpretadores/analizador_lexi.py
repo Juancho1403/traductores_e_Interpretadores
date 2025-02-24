@@ -1,33 +1,34 @@
 import re
 
 # Definimos los patrones de tokens
-TOKEN_PATTERNS = [
-    ("Comment", r"//.*|/\*[\s\S]*?\*/"),
-    ("Data Type", r"\b(int|float|double|boolean|char|string|String)\b"),
-    ("Conditional", r"\b(if|else)\b"),
-    ("Loop", r"\b(for|while)\b"),
-    ("Exception", r"\b(try|catch|throw)\b"),
-    ("Access Modifier", r"\b(public|private|protected)\b"),
-    ("Data Structure", r"\b(array|list|set)\b"),
-    ("Print", r"\b(System.out.print|System.out.println|System.out.printf)\b"),
-    ("String Literal", r'"([^"\\]*(\\.[^"\\]*)*)"'),
-    ("Number", r"\b\d+(\.\d+)?\b"),
-    ("Reserved Word", r"\b(class|public|private|protected|static|void|if|else|while|for|return|try|catch|throw)\b"),
-    ("Identifier", r"\b[a-zA-Z_][a-zA-Z0-9_]*\b"),
-    ("Arithmetic Operator", r"[+\-*/%]"),
-    ("Assignment Operator", r"="),
-    ("Compound Operator", r"(\+=|-=|\*=|/=)"),
-    ("Logical Operator", r"(&&|\|\||!)"),
-    ("Relational Operator", r"(==|!=|<|>|<=|>=)"),
-    ("Delimiter", r"[;{}(),]"),
-    ("Opening Bracket", r"\["),
-    ("Closing Bracket", r"\]"),
-    ("Newline", r"\n"),
-    ("WHITESPACE", r"[ \t]+"),
-    ("ERROR", r".")  # Matches any unexpected character
+PATRONES_TOKEN = [
+    ("Comentario", r"//.*|/\*[\s\S]*?\*/"),
+    ("Tipo de Dato", r"\b(int|float|double|boolean|char|string|String)\b"),
+    ("Condicional", r"\b(if|else)\b"),
+    ("Bucle", r"\b(for|while)\b"),
+    ("Excepción", r"\b(try|catch|throw)\b"),
+    ("Modificador de Acceso", r"\b(public|private|protected)\b"),
+    ("Estructura de Datos", r"\b(array|list|set)\b"),
+    ("Impresión", r"\b(System.out.print|System.out.println|System.out.printf)\b"),
+    ("Literal de Cadena", r'"([^"\\]*(\\.[^"\\]*)*)"'),
+    ("Número", r"\b\d+(\.\d+)?\b"),
+    ("Palabra Reservada", r"\b(class|public|private|protected|static|void|if|else|while|for|return|try|catch|throw)\b"),
+    ("Identificador", r"\b[a-zA-Z_][a-zA-Z0-9_]*\b"),
+    ("Operador Aritmético", r"[+\-*/%]"),
+    ("Operador de Asignación", r"="),
+    ("Operador Combinado", r"(\+=|-=|\*=|/=)"),
+    ("Operador Lógico", r"(&&|\|\||!)"),
+    ("Operador Relacional", r"(==|!=|<|>|<=|>=)"),
+    ("Delimitador", r"[;{}(),]"),
+    ("Corchete de Apertura", r"\["),
+    ("Corchete de Cierre", r"\]"),
+    ("Salto de Línea", r"\n"),
+    ("ESPACIO EN BLANCO", r"[ \t]+"),
+    ("ERROR", r".")  # Coincide con cualquier carácter inesperado
 ]
 
-TOKEN_REGEX = [(name, re.compile(pattern)) for name, pattern in TOKEN_PATTERNS] #Se compilan las expresiones regulares una sola vez antes del bucle
+# Compilamos las expresiones regulares una sola vez antes del bucle
+REGEX_TOKENS = [(nombre, re.compile(patron)) for nombre, patron in PATRONES_TOKEN]
 
 # Lista de palabras reservadas en Java
 PALABRAS_RESERVADAS = [
@@ -48,27 +49,29 @@ def analizar_palabras_reservadas(texto_entrada):
     return [palabra for palabra in palabras if palabra in PALABRAS_RESERVADAS]
 
 # Función para análisis del código
-def lexer(code):
+def lexer(codigo):
     tokens = []
-    position = 0
+    posicion = 0
 
-    while position < len(code):
-        match = None
-        for token_type, regex in TOKEN_REGEX:
-            match = regex.match(code, position)
+    while posicion < len(codigo):
+        coincidencia = None
+        for tipo_token, regex in REGEX_TOKENS:
+            coincidencia = regex.match(codigo, posicion)
 
-            if match:
-                value = match.group(0)
-                if token_type != "WHITESPACE":  # Ignorar espacios
-                    tokens.append((token_type, value))
-                position = match.end()
+            if coincidencia:
+                valor = coincidencia.group(0)
+                if tipo_token != "ESPACIO EN BLANCO":  # Ignorar espacios
+                    inicio_pos = posicion
+                    fin_pos = coincidencia.end()
+                    tokens.append((tipo_token, valor, f"{inicio_pos}-{fin_pos}"))
+                posicion = coincidencia.end()
                 break
 
-        if not match:
-            raise SyntaxError(f"Unexpected character {position}: {code[position]}")
+        if not coincidencia:
+            raise SyntaxError(f"Carácter inesperado {posicion}: {codigo[posicion]}")
 
     # Ahora analizamos las palabras reservadas en el código
-    palabras_reservadas = analizar_palabras_reservadas(code)
+    palabras_reservadas = analizar_palabras_reservadas(codigo)
     print("Palabras reservadas en el código:", palabras_reservadas)
     
     return tokens

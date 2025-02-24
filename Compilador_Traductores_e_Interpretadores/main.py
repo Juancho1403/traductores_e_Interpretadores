@@ -1,16 +1,17 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from vista.analizador_lexico import Ui_home  # Asegúrate de que esta importación sea válida
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem
+from vista.analizador_lexico import Ui_analizador_lexico  # Asegúrate de que esta importación sea válida
 import analizador_lexi  # Importa tu analizador léxico real
 
-class Main(QMainWindow):
+
+class Analizador_lexico(QMainWindow):
     """ Clase principal de nuestra aplicación """
     def __init__(self):
         """ Inicializa la aplicación """
         super().__init__()
 
         # Instanciamos nuestra interfaz gráfica
-        self.home = Ui_home()
+        self.home = Ui_analizador_lexico()
         self.home.setupUi(self)
 
         # Conectar botones a funciones
@@ -35,24 +36,30 @@ class Main(QMainWindow):
         if not code:
             QMessageBox.warning(self, "Advertencia", "El editor está vacío. Por favor, cargue o escriba código Java.")
             return
-        
+
         # Análisis léxico del código
         tokens = analizador_lexi.lexer(code)  # Usamos el método lexer modificado
 
-        # Mostrar resultados en el campo de texto de resultados
         if tokens:
-            # Mostramos los tokens y las palabras reservadas encontradas
-            resultado = "\n".join([f"{tipo}: {valor}" for tipo, valor in tokens])
-            self.home.resultsViewer.setPlainText(resultado)
+            self.home.resultsTable.setRowCount(len(tokens))  # Ajusta filas
+            self.home.resultsTable.setColumnCount(3)  # Tres columnas
+
+            self.home.resultsTable.setHorizontalHeaderLabels(["Tipo de Token", "Valor", "Posición"])
+
+            for i, (tipo, valor, pos) in enumerate(tokens):
+                self.home.resultsTable.setItem(i, 0, QTableWidgetItem(tipo))
+                self.home.resultsTable.setItem(i, 1, QTableWidgetItem(str(valor)))
+                self.home.resultsTable.setItem(i, 2, QTableWidgetItem(str(pos)))
         else:
-            self.home.resultsViewer.setPlainText("No se encontraron tokens.")
+            QMessageBox.information(self, "Resultado", "No se encontraron tokens.")
 
 def iniciar():
     """ Inicia la aplicación """
     app = QApplication(sys.argv)
-    ventana = Main()
+    ventana = Analizador_lexico()
     ventana.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     iniciar()
